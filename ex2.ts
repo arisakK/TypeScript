@@ -51,25 +51,21 @@ export const removeStudentScoreBySubject = (store: IStore[], record: IRemoveStud
 
 export const getStudentScoreBySubject = (store: IStore[], subjects: string[]): IStudentScore[] => {
   return store.reduce((prev,cur) => {
-    for(const subject of subjects){
-      if(subject.includes(cur.subject)){
+      if(subjects.includes(cur.subject)){
         for (const student of cur.students) {
-          const index = prev.findIndex(per => per.name === student.name)
-          if(index  >= 0){
-            prev[index][subject] = student.score;
+          const studentExist = prev.find(per => per.name === student.name)
+          if(studentExist){
+            studentExist[cur.subject] = student.score;
           }else{
-            prev.push({name : student.name,[cur.subject]: student.score})
+           const newStudent = { name : student.name }
+            for(const subject of subjects){
+                newStudent[subject] = null;
+            }
+            newStudent[cur.subject] = student.score || null;
+            prev.push(newStudent)
           }
-        }
-      }
-
-      for(const data of prev){
-        if(!data[subject]){
-          data[subject] = null;
-        }
       }
     }
-
     return prev
   },[])
 }
